@@ -1,6 +1,6 @@
-from hyphenation_alg import Hyphenation
+from app import App
 
-config: dict = {'data_file': 'list_of_patterns.txt'}
+config: dict = {'debug': False}
 
-app = Hyphenation(config)
+app = App(config)
 app.run()
