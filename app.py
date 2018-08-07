@@ -26,13 +26,16 @@ class App:
             except NotImplementedError:
                 print('This feature has not been implemented yet, sorry :-(')
 
-            print('Do you want to continue?[Y/n]')
-            user_input = input().strip().lower()
-            if user_input == 'n':
-                print(App.MESSAGE_EXIT)
-                exit()
+            self.ask_for_continue()
 
     def get_mode_name(self, mode):
         for mode_name, value in self.MODES.items():
             if value == mode:
                 return mode_name
+
+    def ask_for_continue(self):
+        print('Do you want to continue?[Y/n]')
+        user_input = input().strip().lower()
+        if user_input == 'n':
+            print(App.MESSAGE_EXIT)
+            exit()
