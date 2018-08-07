@@ -1,84 +1,57 @@
 import re
 
+"""
+By default looks for patterns.txt in the same directory
+"""
 
-class Hyphenation:
-    WELCOME_MESSAGE: str = 'Welcome to the application'
+
+class Hyphenator:
+    DEFAULT_CONFIG: dict = {'patterns_file': 'patterns.txt', 'debug': False}
 
     def __init__(self, config: dict):
-        self.data_file = config.get('data_file')
+        self.config = {**self.DEFAULT_CONFIG, **config}
+        # self.patterns_file = config.get('patterns_file') or self.DEFAULT_CONFIG.get('patterns_file')
 
-        with open(self.data_file, 'rt') as file:
+        with open(self.config['patterns_file'], 'rt') as file:
             self.data_list = [line.strip() for line in file.readlines()]
-            # print(self.data_list)
 
-    def run(self):
-        print(Hyphenation.WELCOME_MESSAGE)
-        # word = input('Type in the word for hyphenation: ').strip()
-        self.hyphenate()
+    def is_verbose(self):
+        return self.config.get('debug') is True
 
-    def hyphenate(self):
-        word = input('Type in the word for hyphenation: ').strip()
+    def hyphenate(self, word):
         letters = list(word)
 
-        for i, val in enumerate(letters):
-            if i % 2 == 0:
-                letters.insert(i, '0')
-        letters.pop(0)
+        array_for_numbers = [0 for i in range(len(word) + 1)]
 
         # pattern without dots and numbers
         clean_patterns = []
         for pattern in self.data_list:
-            matched = re.fullmatch(r'(\.\w+)|(\w+)|(\w+\.)', pattern)
-            if matched:
-                pattern = re.sub(r'[\.\d+]|[\d+\.$]', '', pattern)
-                clean_patterns.append(pattern)
+            pattern = re.sub(r'[\.\d+]|[\.\d+]', '', pattern)
+            clean_patterns.append(pattern)
 
         # create a dictionary for 'patterns': 'clean_patterns'
         patterns_dict = dict(zip(self.data_list, clean_patterns))
 
-        for key, value in patterns_dict.items():
-            # find the beginning of the word
-            if word.startswith(value) and key[0] == '.':
-                # print(key)
-                for char in key:
-                    if char.isdigit():
-                        letters[key.find(char) + 1] = char
+        for pattern, clean_pattern in patterns_dict.items():
+            pattern_position = word.find(clean_pattern)
+            while pattern_position > -1:
+                word_offset = pattern_position + len(clean_pattern)
+                if (pattern[0] == '.' and pattern_position == 0) or (
+                        pattern[-1] == '.' and pattern_position == len(word) - len(clean_pattern)) or (
+                        pattern[0] != '.' and pattern[-1] != '.'):
+                    # print(pattern)
+                    for char in pattern:
+                        if char.isalpha():
+                            pattern_position += 1
+                        if char.isdigit() and int(char) > array_for_numbers[pattern_position]:
+                            array_for_numbers[pattern_position] = int(char)
+                pattern_position = word.find(clean_pattern, word_offset)
 
-            # find matches between beginning and the end
-            elif value in word and key[0] != '.' and key[-1] != '.':
-                # print(key)
-                value_position = word.find(value)
-                for char in key:
-                    if char.isdigit():
-                        if key[0] is char:
-                            if letters[value_position * 2 - 1] < char:
-                                letters[value_position * 2 - 1] = char
-                            else:
-                                letters[value_position * 2 - 1] = char
-                        else:
-                            letters[value_position * 2 + 1] = char
-
-            # find the end of the word
-            elif word.endswith(value) and key[-1] == '.':
-                # print(key)
-                value_position = word.find(value)
-                for char in key:
-                    if char.isdigit():
-                        if letters[value_position * 2 - 1].isdigit():
-                            if letters[value_position * 2 - 1] < char:
-                                letters[value_position * 2 - 1] = char
-                        else:
-                            letters.insert(value_position * 2 - 1, char)
-
-        for char in letters:
-            if char.isdigit() and int(char) % 2 == 0:
-                letters.remove(char)
-
-        word_with_odds = ''.join(letters)
-        hyphenated_word = ''
-        for char in word_with_odds:
-            if char.isdigit() and int(char) % 2 != 0:
-                hyphenated_word = word_with_odds.replace(char, '-')
-                word_with_odds = hyphenated_word
-
-        print('Hyphenated word: ', hyphenated_word)
+        hyphenated_word = letters
+        offset = 0
+        for i in range(1, len(array_for_numbers) - 1):
+            if array_for_numbers[i] % 2 != 0:
+                letters.insert(i + offset, '-')
+                offset += 1
+            hyphenated_word = ''.join(letters)
+        return hyphenated_word
