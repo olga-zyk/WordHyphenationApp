@@ -2,14 +2,14 @@ from context import Context
 
 
 class App:
-    MESSAGE_WELCOME: str = 'Welcome!\nPlease select an operating mode of the application\n'
+    MESSAGE_WELCOME: str = 'Welcome!\nPlease select the operating mode:'
     MESSAGE_EXIT: str = 'See you later! :)\n'
     MODES = {'interactive': '1', 'batch': '2'}
 
     def __init__(self, config: dict):
         self.config = config
-        self.operating_mode = 'Interactive:\t' + self.MODES['interactive'] \
-                              + '\nBatch:\t\t\t' + self.MODES['batch'] + '\n'
+        self.operating_mode = '\tInteractive:\t' + self.MODES['interactive'] \
+                              + '\n\tBatch:\t\t\t' + self.MODES['batch'] + '\n'
 
     def run(self):
         print(App.MESSAGE_WELCOME)
