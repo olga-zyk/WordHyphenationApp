@@ -1,5 +1,5 @@
-from batch_mode import BatchMode
-from interactive_mode import InteractiveMode
+from src.app_mode.batch_mode import BatchMode
+from src.app_mode.interactive_mode import InteractiveMode
 
 
 class Context:

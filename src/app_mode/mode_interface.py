@@ -1,7 +1,7 @@
 import abc
 
 
-class StrategyInterface(metaclass=abc.ABCMeta):
+class ApplicationMode(metaclass=abc.ABCMeta):
     def __init__(self):
         self.config = None
 

@@ -1,4 +1,4 @@
-from context import Context
+from src.app.context import Context
 
 
 class App:
